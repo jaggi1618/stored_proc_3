@@ -1,0 +1,73 @@
+fileVersion: 1
+id: 072875ae-29b8-4c88-9e81-a099b0f865af
+name: DW_POLICY_CURRENT
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: REF
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 22b3c6bf-9452-4446-839b-e3b2d3b585f6
+          stepCounter: 072875ae-29b8-4c88-9e81-a099b0f865af
+        config: {}
+        dataType: NUMBER(10,0)
+        defaultValue: ""
+        description: ""
+        name: DW_POLICY_ID
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: f8aec5af-543e-4606-a6f3-c1ed17b8fe9d
+          stepCounter: 072875ae-29b8-4c88-9e81-a099b0f865af
+        config: {}
+        dataType: VARCHAR(50)
+        defaultValue: ""
+        description: ""
+        name: SOURCE_SYSTEM_POLICY_ID
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: ff64586b-b5a9-4893-98a6-4041cdb8bfb9
+          stepCounter: 072875ae-29b8-4c88-9e81-a099b0f865af
+        config: {}
+        dataType: VARCHAR(100)
+        defaultValue: ""
+        description: ""
+        name: SOURCE_SYSTEM
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+  name: DW_POLICY_CURRENT
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node

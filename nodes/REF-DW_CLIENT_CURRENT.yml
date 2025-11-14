@@ -1,0 +1,92 @@
+fileVersion: 1
+id: 6f0d86ac-c5a8-4f2d-ac25-a9e4b422599c
+name: DW_CLIENT_CURRENT
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: REF
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: fab918fc-6b76-4783-bf71-3e0f5a64c7f4
+          stepCounter: 6f0d86ac-c5a8-4f2d-ac25-a9e4b422599c
+        config: {}
+        dataType: NUMBER(10,0)
+        defaultValue: ""
+        description: ""
+        name: DW_CLIENT_ID
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: f4de1e99-5619-4d2f-8814-4d98cefac3ec
+          stepCounter: 6f0d86ac-c5a8-4f2d-ac25-a9e4b422599c
+        config: {}
+        dataType: NUMBER(10,0)
+        defaultValue: ""
+        description: ""
+        name: DW_CLIENT_MASTER_ID
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 4417aca3-bd11-4311-95a5-0cd76a89911c
+          stepCounter: 6f0d86ac-c5a8-4f2d-ac25-a9e4b422599c
+        config: {}
+        dataType: VARCHAR(50)
+        defaultValue: ""
+        description: ""
+        name: SOURCE_SYSTEM_CLIENT_ID
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: a3afc817-0be8-4641-b069-9103d3cb88ca
+          stepCounter: 6f0d86ac-c5a8-4f2d-ac25-a9e4b422599c
+        config: {}
+        dataType: VARCHAR(100)
+        defaultValue: ""
+        description: ""
+        name: SOURCE_SYSTEM
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+  name: DW_CLIENT_CURRENT
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node

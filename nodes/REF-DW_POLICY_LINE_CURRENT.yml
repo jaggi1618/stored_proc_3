@@ -1,0 +1,73 @@
+fileVersion: 1
+id: b25e8848-6d7b-4fc9-9ecb-874076893700
+name: DW_POLICY_LINE_CURRENT
+operation:
+  database: ""
+  deployEnabled: true
+  description: ""
+  locationName: REF
+  metadata:
+    columns:
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: cfb5f99f-bc0d-4852-b53e-5b01e32fdaf3
+          stepCounter: b25e8848-6d7b-4fc9-9ecb-874076893700
+        config: {}
+        dataType: NUMBER(10,0)
+        defaultValue: ""
+        description: ""
+        name: DW_POLICY_LINE_ID
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: e3ccfdc8-8fd1-40be-be2b-581fb8bd5f9d
+          stepCounter: b25e8848-6d7b-4fc9-9ecb-874076893700
+        config: {}
+        dataType: VARCHAR(50)
+        defaultValue: ""
+        description: ""
+        name: SOURCE_SYSTEM_POLICY_LINE_ID
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+      - acceptedValues:
+          strictMatch: true
+          values: []
+        appliedColumnTests: {}
+        columnReference:
+          columnCounter: 4d77d943-fc82-4ada-8eaa-2cd9abd0f0be
+          stepCounter: b25e8848-6d7b-4fc9-9ecb-874076893700
+        config: {}
+        dataType: VARCHAR(100)
+        defaultValue: ""
+        description: ""
+        name: SOURCE_SYSTEM
+        nullable: true
+        primaryKey: false
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: ""
+        uniqueKey: false
+  name: DW_POLICY_LINE_CURRENT
+  schema: ""
+  sqlType: Source
+  type: sourceInput
+  version: 1
+type: Node
