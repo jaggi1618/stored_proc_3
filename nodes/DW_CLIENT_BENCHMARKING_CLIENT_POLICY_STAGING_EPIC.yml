@@ -1,0 +1,92 @@
+fileVersion: 1
+id: 5a2e8c6d-9b3f-4e0a-8d1c-7f5b6a9c3d4e
+name: DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC
+operation:
+  config:
+    insertStrategy: INSERT
+    postSQL: ""
+    preSQL: |-
+      MERGE INTO {{ this }} AS TGT
+      USING (
+          SELECT
+              s.UniqEntity,
+              s.UniqPolicy,
+              s.UniqLine,
+              s.EffectiveDate,
+              s.ExpirationDate,
+              c.dw_client_id,
+              c.dw_client_master_id,
+              p.dw_policy_id,
+              l.dw_policy_line_id,
+              sc.dw_structure_id,
+              ci.dw_company_id AS dw_company_id_issuing,
+              cb.dw_company_id AS dw_company_id_billing,
+              p_eplt.policy_line_type,
+              l_eplt.policy_line_type AS line_type,
+              (SELECT dw_source_system_id FROM ALLIANT_DW.DBO.DW_SOURCE_SYSTEM WHERE source_system = 'Epic' AND agency_company = 'Alliant') AS dw_source_system_id
+          FROM ALLIANT_DW_STAGE.DBO.DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC s
+          LEFT JOIN ALLIANT_DW.DBO.DW_CLIENT_CURRENT c ON s.UniqEntity = c.source_system_client_id AND c.source_system = 'Epic'
+          LEFT JOIN ALLIANT_DW.DBO.DW_POLICY_CURRENT p ON s.UniqPolicy = p.source_system_policy_id AND p.source_system = 'Epic'
+          LEFT JOIN ALLIANT_DW.DBO.DW_POLICY_LINE_CURRENT l ON s.UniqLine = l.source_system_policy_line_id AND l.source_system = 'Epic'
+          LEFT JOIN ALLIANT_DW.DBO.DW_COMPANY ci ON CAST(s.UniqEntityCompanyIssuing AS VARCHAR(50)) = ci.source_company_uniq_id AND ci.source_system = 'Epic'
+          LEFT JOIN ALLIANT_DW.DBO.DW_COMPANY cb ON CAST(s.UniqEntityCompanyBilling AS VARCHAR(50)) = cb.source_company_uniq_id AND cb.source_system = 'Epic'
+          LEFT JOIN ALLIANT_DW.DBO.DW_STRUCTURE_CURRENT sc ON s.UniqAgency = sc.source_system_uniq_agency
+              AND s.UniqBranch = sc.source_system_uniq_branch
+              AND s.UniqDepartment = sc.source_system_uniq_department
+              AND s.UniqProfitCenter = sc.source_system_uniq_profit_center
+          LEFT OUTER JOIN ALLIANT_DW.REF.EPIC_POLICY_LINE_TYPE p_eplt ON s.PolicyUniqCdPolicyLineType = p_eplt.source_system_policy_line_type_id
+          LEFT OUTER JOIN ALLIANT_DW.REF.EPIC_POLICY_LINE_TYPE l_eplt ON s.UniqCdPolicyLineType = l_eplt.source_system_policy_line_type_id
+      ) AS SRC
+      ON TGT.UniqLine = SRC.UniqLine
+      AND TGT.UniqPolicy = SRC.UniqPolicy
+      AND TGT.UniqEntity = SRC.UniqEntity
+      WHEN MATCHED THEN
+          UPDATE SET
+              TGT.dw_client_id = IFNULL(SRC.dw_client_id, -1),
+              TGT.dw_client_master_id = IFNULL(SRC.dw_client_master_id, -1),
+              TGT.dw_policy_id = IFNULL(SRC.dw_policy_id, -1),
+              TGT.dw_policy_line_id = IFNULL(SRC.dw_policy_line_id, -1),
+              TGT.dw_structure_id = IFNULL(SRC.dw_structure_id, -1),
+              TGT.dw_company_id_issuing = IFNULL(SRC.dw_company_id_issuing, -1),
+              TGT.dw_company_id_billing = IFNULL(SRC.dw_company_id_billing, -1),
+              TGT.dw_date_id_effective_date = IFNULL(TRY_TO_NUMBER(TO_VARCHAR(SRC.EffectiveDate, 'YYYYMMDD')), -1),
+              TGT.dw_date_id_expiration_date = IFNULL(TRY_TO_NUMBER(TO_VARCHAR(SRC.ExpirationDate, 'YYYYMMDD')), -1),
+              TGT.policy_type = SRC.policy_line_type,
+              TGT.line_type = SRC.line_type,
+              TGT.dw_source_system_id = SRC.dw_source_system_id,
+              TGT.dw_date_updated = CURRENT_TIMESTAMP(),
+              TGT.dw_update_user = 'dbo.spdw_dw_client_benchmarking_client_policy_staging_epic_update';
+    testsEnabled: true
+    truncateBefore: false
+  database: ""
+  deployEnabled: true
+  description: UPDATE-only conversion of spdw_dw_client_benchmarking_client_policy_staging_epic_update
+  isMultisource: false
+  locationName: DBSHIFT
+  materializationType: table
+  metadata:
+    appliedNodeTests: []
+    columns:
+      - appliedColumnTests: {}
+        columnReference:
+          columnCounter: b1c4d7e3-9f8a-4b6d-a2c4-7e9f8a6b5c4d
+          stepCounter: 5a2e8c6d-9b3f-4e0a-8d1c-7f5b6a9c3d4e
+        config: {}
+        dataType: TIMESTAMP_NTZ
+        description: ""
+        name: SYSTEM_UPDATE_DATE
+        nullable: true
+        sourceColumnReferences:
+          - columnReferences: []
+            transform: ""
+        transform: CURRENT_TIMESTAMP()
+    cteString: ""
+    enabledColumnTestIDs: []
+    sourceMapping: []
+  name: DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC
+  overrideSQL: false
+  schema: ""
+  sqlType: persistentStage
+  type: sql
+  version: 1
+type: Node
