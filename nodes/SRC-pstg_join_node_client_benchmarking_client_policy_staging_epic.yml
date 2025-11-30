@@ -1,10 +1,100 @@
 fileVersion: 1
 id: 128bf88b-cdd6-402e-bd90-b0964fde5137
-name: STG_DW_POLICY_CURRENT_DW_CLIENT_CURRENT_DW_COMPANY_DW_POLICY_LINE_CURRENT_DW_STRUCTURE_CURRENT_DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC
+name: pstg_join_node_client_benchmarking_client_policy_staging_epic
 operation:
   config:
     insertStrategy: INSERT
-    postSQL: ""
+    postSQL: |
+      MERGE INTO STORED_PROC_3_SRC.DBO.DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC AS TGT
+      USING (
+          SELECT
+              s.UniqEntity,
+              s.UniqPolicy,
+              s.UniqLine,
+              s.EffectiveDate,
+              s.ExpirationDate,
+
+              c.dw_client_id,
+              c.dw_client_master_id,
+
+              p.dw_policy_id,
+              l.dw_policy_line_id,
+              sc.dw_structure_id,
+
+              ci.dw_company_id AS dw_company_id_issuing,
+              cb.dw_company_id AS dw_company_id_billing,
+
+              p_eplt.policy_line_type,
+              l_eplt.policy_line_type AS line_type,
+
+              (
+                  SELECT dw_source_system_id 
+                  FROM STORED_PROC_3_REF.DBO.DW_SOURCE_SYSTEM
+                  WHERE source_system = 'Epic'
+                    AND agency_company = 'Alliant'
+              ) AS dw_source_system_id
+
+          FROM STORED_PROC_3_SRC.DBO.DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC s
+          
+          LEFT JOIN STORED_PROC_3_REF.DBO.DW_CLIENT_CURRENT c
+              ON s.UniqEntity = c.source_system_client_id
+             AND c.source_system = 'Epic'
+
+          LEFT JOIN STORED_PROC_3_REF.DBO.DW_POLICY_CURRENT p
+              ON s.UniqPolicy = p.source_system_policy_id
+             AND p.source_system = 'Epic'
+
+          LEFT JOIN STORED_PROC_3_REF.DBO.DW_POLICY_LINE_CURRENT l
+              ON s.UniqLine = l.source_system_policy_line_id
+             AND l.source_system = 'Epic'
+
+          LEFT JOIN STORED_PROC_3_REF.DBO.DW_COMPANY ci
+              ON CAST(s.UniqEntityCompanyIssuing AS VARCHAR(50)) = ci.source_company_uniq_id
+             AND ci.source_system = 'Epic'
+
+          LEFT JOIN STORED_PROC_3_REF.DBO.DW_COMPANY cb
+              ON CAST(s.UniqEntityCompanyBilling AS VARCHAR(50)) = cb.source_company_uniq_id
+             AND cb.source_system = 'Epic'
+
+          LEFT JOIN STORED_PROC_3_REF.DBO.DW_STRUCTURE_CURRENT sc
+              ON s.UniqAgency = sc.source_system_uniq_agency
+             AND s.UniqBranch = sc.source_system_uniq_branch
+             AND s.UniqDepartment = sc.source_system_uniq_department
+             AND s.UniqProfitCenter = sc.source_system_uniq_profit_center
+
+          LEFT JOIN STORED_PROC_3_REF.DBO.REF_EPIC_POLICY_LINE_TYPE p_eplt
+              ON s.PolicyUniqCdPolicyLineType = p_eplt.source_system_policy_line_type_id
+
+          LEFT JOIN STORED_PROC_3_REF.DBO.REF_EPIC_POLICY_LINE_TYPE l_eplt
+              ON s.UniqCdPolicyLineType = l_eplt.source_system_policy_line_type_id
+
+      ) SRC
+      ON  TGT.UniqLine   = SRC.UniqLine
+      AND TGT.UniqPolicy = SRC.UniqPolicy
+      AND TGT.UniqEntity = SRC.UniqEntity
+
+      WHEN MATCHED THEN UPDATE SET
+          TGT.dw_client_id              = COALESCE(SRC.dw_client_id, -1),
+          TGT.dw_client_master_id       = COALESCE(SRC.dw_client_master_id, -1),
+          TGT.dw_policy_id              = COALESCE(SRC.dw_policy_id, -1),
+          TGT.dw_policy_line_id         = COALESCE(SRC.dw_policy_line_id, -1),
+          TGT.dw_structure_id           = COALESCE(SRC.dw_structure_id, -1),
+
+          TGT.dw_company_id_issuing     = COALESCE(SRC.dw_company_id_issuing, -1),
+          TGT.dw_company_id_billing     = COALESCE(SRC.dw_company_id_billing, -1),
+
+          TGT.dw_date_id_effective_date =
+              COALESCE(TO_NUMBER(TO_CHAR(SRC.EffectiveDate, 'YYYYMMDD')), -1),
+
+          TGT.dw_date_id_expiration_date =
+              COALESCE(TO_NUMBER(TO_CHAR(SRC.ExpirationDate, 'YYYYMMDD')), -1),
+
+          TGT.policy_type               = SRC.policy_line_type,
+          TGT.line_type                 = SRC.line_type,
+
+          TGT.dw_source_system_id       = SRC.dw_source_system_id,
+          TGT.dw_date_updated           = CURRENT_TIMESTAMP(),
+          TGT.dw_update_user            = 'dbo.spdw_dw_client_benchmarking_client_policy_staging_epic_update';
     preSQL: ""
     testsEnabled: true
     truncateBefore: true
@@ -12,7 +102,7 @@ operation:
   deployEnabled: true
   description: ""
   isMultisource: false
-  locationName: TARGET
+  locationName: SRC
   materializationType: table
   metadata:
     appliedNodeTests: []
@@ -30,7 +120,7 @@ operation:
           - columnReferences:
               - columnCounter: 22b3c6bf-9452-4446-839b-e3b2d3b585f6
                 stepCounter: 072875ae-29b8-4c88-9e81-a099b0f865af
-            transform: ""
+            transform: COALESCE("DW_POLICY_CURRENT"."DW_POLICY_ID", -1)
       - appliedColumnTests: {}
         columnReference:
           columnCounter: 61440d03-ca5c-4cab-ae54-5d993be22af5
@@ -72,7 +162,7 @@ operation:
           - columnReferences:
               - columnCounter: fab918fc-6b76-4783-bf71-3e0f5a64c7f4
                 stepCounter: 6f0d86ac-c5a8-4f2d-ac25-a9e4b422599c
-            transform: ""
+            transform: COALESCE("DW_CLIENT_CURRENT"."DW_CLIENT_ID", -1)
       - appliedColumnTests: {}
         columnReference:
           columnCounter: 7a2942b1-8104-4a70-aa19-56577ee2f886
@@ -86,7 +176,7 @@ operation:
           - columnReferences:
               - columnCounter: f4de1e99-5619-4d2f-8814-4d98cefac3ec
                 stepCounter: 6f0d86ac-c5a8-4f2d-ac25-a9e4b422599c
-            transform: ""
+            transform: "COALESCE(\"DW_CLIENT_CURRENT\".\"DW_CLIENT_MASTER_ID\", -1) "
       - appliedColumnTests: {}
         columnReference:
           columnCounter: 9ffd84fd-dadf-43a9-9a13-652226e0b5ee
@@ -128,7 +218,7 @@ operation:
           - columnReferences:
               - columnCounter: cfb5f99f-bc0d-4852-b53e-5b01e32fdaf3
                 stepCounter: b25e8848-6d7b-4fc9-9ecb-874076893700
-            transform: ""
+            transform: COALESCE("DW_POLICY_LINE_CURRENT"."DW_POLICY_LINE_ID", -1)
       - appliedColumnTests: {}
         columnReference:
           columnCounter: b4495553-568a-4762-9ce2-4cb9cd6b490e
@@ -170,7 +260,7 @@ operation:
           - columnReferences:
               - columnCounter: fdda0b8f-bf2a-4846-9b99-86b3cd6590df
                 stepCounter: b6e65151-dd51-4e45-abb6-45ede0bd170d
-            transform: ""
+            transform: COALESCE("DW_STRUCTURE_CURRENT"."DW_STRUCTURE_ID", -1)
       - appliedColumnTests: {}
         columnReference:
           columnCounter: b80b6d0b-41d2-49a2-a274-44ee6c19fbf0
@@ -564,7 +654,7 @@ operation:
           - columnReferences:
               - columnCounter: 734bab34-1059-4d1a-8959-ecb7f16f9f0b
                 stepCounter: b8b0df05-3e72-496c-b50c-9170dda66109
-            transform: GETDATE()
+            transform: "{{current_timestamp}}"
       - appliedColumnTests: {}
         columnReference:
           columnCounter: 595387ea-0498-4f8d-9056-8a0494492e56
@@ -578,7 +668,7 @@ operation:
           - columnReferences:
               - columnCounter: 52ba8bd6-9f42-423a-9640-167ea498c4cc
                 stepCounter: b8b0df05-3e72-496c-b50c-9170dda66109
-            transform: "'[dbo].[spdw_dw_client_benchmarking_client_policy_staging_epic_update]'"
+            transform: "{{proc_name}}"
       - acceptedValues:
           strictMatch: true
           values: []
@@ -768,12 +858,12 @@ operation:
 
             LEFT JOIN {{ ref('REF', 'REF_EPIC_POLICY_LINE_TYPE') }} "L_EPLT" 
                 ON "DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC".UNIQCDPOLICYLINETYPE = "L_EPLT".SOURCE_SYSTEM_POLICY_LINE_TYPE_ID
-        name: STG_DW_POLICY_CURRENT_DW_CLIENT_CURRENT_DW_COMPANY_DW_POLICY_LINE_CURRENT_DW_STRUCTURE_CURRENT_DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC
+        name: pstg_join_node_client_benchmarking_client_policy_staging_epic
         noLinkRefs: []
-  name: STG_DW_POLICY_CURRENT_DW_CLIENT_CURRENT_DW_COMPANY_DW_POLICY_LINE_CURRENT_DW_STRUCTURE_CURRENT_DW_CLIENT_BENCHMARKING_CLIENT_POLICY_STAGING_EPIC
+  name: pstg_join_node_client_benchmarking_client_policy_staging_epic
   overrideSQL: false
   schema: ""
-  sqlType: Stage
+  sqlType: persistentStage
   type: sql
   version: 1
 type: Node

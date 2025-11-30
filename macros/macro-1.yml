@@ -1,0 +1,17 @@
+fileVersion: 1
+id: "1"
+macroString: |-
+  {% set source_system_epic = "'Epic'" %}
+  {% set current_timestamp = 'CAST(CURRENT_TIMESTAMP AS TIMESTAMP)' %}
+  {% set proc_name = "'dbo.spdw_dw_client_benchmarking_client_policy_staging_epic_update'" %}
+  {% set agency_name = "'Alliant'" %}
+
+
+  {% macro get_source_system_id(source_system, agency) %}
+  (SELECT dw_source_system_id
+   FROM Alliant_DW.dbo.dw_source_system
+   WHERE source_system = {{ source_system }}
+     AND agency_company = {{ agency }})
+  {% endmacro %}
+name: macro
+type: Macro
